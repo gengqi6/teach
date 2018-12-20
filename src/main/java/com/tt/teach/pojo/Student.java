@@ -12,13 +12,22 @@ public class Student implements Serializable{
    private Integer studentNo;
    private String loginPwd;
    private String studentName;
-   private char sex;
+   private String sex;
    private Integer gradeId;
    private String phone;
    private String address;
    private Date bornDate;
    private String email;
    private String identityCard;
+   private String gradeName;
+
+    public String getGradeName() {
+        return gradeName;
+    }
+
+    public void setGradeName(String gradeName) {
+        this.gradeName = gradeName;
+    }
 
     public Integer getStudentNo() {
         return studentNo;
@@ -44,11 +53,11 @@ public class Student implements Serializable{
         this.studentName = studentName;
     }
 
-    public char getSex() {
+    public String getSex() {
         return sex;
     }
 
-    public void setSex(char sex) {
+    public void setSex(String sex) {
         this.sex = sex;
     }
 
@@ -103,7 +112,7 @@ public class Student implements Serializable{
     public Student() {
     }
 
-    public Student(Integer studentNo, String loginPwd, String studentName, char sex, Integer gradeId, String phone, String address, Date bornDate, String email, String identityCard) {
+    public Student(Integer studentNo, String loginPwd, String studentName, String sex, Integer gradeId, String phone, String address, Date bornDate, String email, String identityCard) {
         this.studentNo = studentNo;
         this.loginPwd = loginPwd;
         this.studentName = studentName;
