@@ -68,7 +68,9 @@
                         </div>
                         <div class="form-group">
                             <label for="gradeID">年级ID</label>
-                            <input type="text" class="form-control" id="gradeID" placeholder="年级ID" required>
+                            <select id="gradeID" name="gradeID" class="form-control">
+                                <option th:each="grade:${gradeList}" th:text="${grade.gradeName}" th:value="${grade.gradeID}"></option>
+                            </select>
                         </div>
                         <button type="button" class="btn btn-primary" id="addSubject">添加</button>
                     </form>
@@ -98,16 +100,168 @@
 <script th:src="@{/static/js/lib/ie10-viewport-bug-workaround.js}"></script>
 <!--1.使用bootstrapTable将json数据渲染到页面-->
 <script>
-   
+    function findSubFn() {
+        $("#table_subject").bootstrapTable({
+            url:"/sub/getSubjectList",
+            type:"GET",
+            dataType:"json",
+            pagination:true,
+            search:true,
+            showRefresh:true,
+            pageSize:5,
+            pageList:[1,2,3,4,5,6,7,8,9,10],
+            columns:[
+                {
+                    field:"subjectNo",
+                    title:"科目编号",
+                    align:"center",
+                    valign:"middle",
+                    searchable:true
+                },{
+                    field:"subjectName",
+                    title:"科目名称",
+                    align:"center",
+                    valign:"middle",
+                    searchable:true
+                },{
+                    field:"classHour",
+                    title:"课时(节)",
+                    align:"center",
+                    valign:"middle",
+                    searchable:true
+                },{
+                    field:"gradeName",
+                    title:"年级名称",
+                    align:"center",
+                    valign:"middle",
+                    searchable:true
+                }
+
+            ]
+        })
+    }
+
+    findSubFn();
 </script>
 <!--2.关于表格点击每一行tr背景颜色的变化。添加了一个class——》tr_new，后面的操作全是通过这个class取获取主键进行操作的-->
 <script>
-  
+    $(function () {
+        $("#table_subject tbody").on("click","tr",function () {
+            //添加样式前，先将上一次的样式移除
+            $("#table_subject tbody tr").removeClass("tr_new");
+            //为当前选中的行，添加类样式tr_new
+            $(this).addClass("tr_new");
+        })
+    })
 </script>
 
 <!--3.对添加，保存，编辑，取消编辑，删除，全部删除进行对应的操作-->
 <script>
-   
+   $(function () {
+       //1.删除
+       $("#del").on("click",function () {
+    var trFather = $(".tr_new");
+    if(trFather.length!=1){
+        alert("请选择一行要删除的数据！");
+    }else{
+        var isOK = confirm("您确定要删除吗？");
+        if(isOK){
+            var subjectNo = trFather.children()[0].innerText;
+            $.ajax({
+                url:"/sub/deleteSubject/"+subjectNo,
+                type:"DELETE",
+                success:function(data){
+                    //将后台的json数据显示弹出，进行温馨提示
+                    alert(data.msg);
+                    //提示完，重新渲染一下页面
+                    window.location.reload();
+                }
+            })
+        }
+    }
+})
+
+       //2.编辑
+       $("#edit").on("click",function () {
+           var trFather = $(".tr_new");
+           if(trFather.length!=1){
+               alert("请选择一行要编辑的数据！");
+           }else{
+               var child = trFather.children();
+               child[1].innerHTML = '<input type="text" size="10" maxlength="15" class="subjectName" value="'+child[1].innerText+'"/>';
+               child[2].innerHTML = '<input type="text" size="3" maxlength="3" class="classHour" value="'+child[2].innerText+'"/>';
+               $("#table_subject tbody tr").unbind("click");
+           }
+           $(this).unbind("click");
+       })
+
+       //3.取消编辑
+       $("#cancel").on("click",function () {
+           window.location.reload();
+       })
+
+       //4.保存
+       $("#save").on("click",function () {
+           var trFather = $(".tr_new");
+           if(trFather.length!=1){
+               alert("请选择一行数据进行编辑！");
+           }else{
+               var subNo = trFather.children()[0].innerText;
+               var subName = $(".subjectName").val();
+               var clHour = $(".classHour").val();
+               $.ajax({
+                   url:"/sub/updateSubject",
+                   type:"PUT",
+                   data:{
+                       subjectNo:subNo,
+                       subjectName:subName,
+                       classHour:clHour
+                   },
+                   success:function (data) {
+                       alert(data.msg);
+                       window.location.reload();
+                   }
+               })
+           }
+       })
+
+       //5.添加
+       $("#addSubject").on("click",function () {
+           var subjectName = $("#subName").val();
+           var classHour = $("#hours").val();
+           var gradeID = $("#gradeID").val();
+           $.ajax({
+               url:"/sub/addSubject",
+               type:"PUT",
+               data: {
+                   subjectName: subjectName,
+                   classHour: classHour,
+                   gradeID: gradeID
+               },
+               success:function (data) {
+                   //1.将后台json数据显示弹出，进行温馨提示
+                   alert(data.msg);
+                   //2.提示完，重新渲染一下页面
+                   window.location.reload();
+               }
+           })
+       })
+
+       //6.全部删除
+       $("#delAll").on("click",function () {
+           var isOK = confirm("您确定要全部删除吗？");
+           if(isOK){
+               alert("小老弟，想进局子里了？");
+           }else{
+               alert("瞎死宝宝了！");
+           }
+       })
+
+
+
+
+
+   })
 </script>
 
 </html>
