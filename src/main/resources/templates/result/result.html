@@ -69,15 +69,17 @@
                         </div>
                         <div class="form-group">
                             <label for="subjectNo">课程编号</label>
-                            <input type="text" class="form-control" id="subjectNo" placeholder="课程编号" required >
+                            <select id="subjectNo" name="subjectNo" class="form-control">
+                                <option th:each="subject:${subjectList}" th:text="${subject.subjectName}" th:value="${subject.subjectNo}"></option>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label for="examDate">考试时间</label>
-                           <input type="text" class="form-control" id="examDate" placeholder="考试时间" required >
+                            <input type="text" id="examDate" name="endTime" placeholder="考试时间" class="form-control form-datetime"  onfocus="WdatePicker({skin:'whyGreen',dateFmt:'yyyy-MM-dd HH:mm:ss',readOnly:true})" required="required" readonly="">
                         </div>
                         <div class="form-group">
                             <label for="studentResult">学生成绩</label>
-                            <input type="text" class="form-control" id="studentResult" placeholder="学生成绩" required>
+                            <input type="text" maxlength="3" class="form-control" id="studentResult" placeholder="学生成绩" required>
                         </div>
                         <button type="button" class="btn btn-primary" id="addResult">录入</button>
                     </form>
@@ -89,7 +91,6 @@
             </div>
         </div>
     </div>
-
 
 </body>
 
@@ -162,17 +163,144 @@
 </script>
 <!--2.关于表格点击每一行tr背景颜色的变化。添加了一个class——》tr_new，后面的操作全是通过这个class取获取主键进行操作的-->
 <script>
-   
+   $(function(){
+       $("#table_result tbody").on("click","tr",function () {
+           //添加样式前，先将上一次的样式移除
+           $("#table_result tbody tr").removeClass("tr_new");
+           //为当前选中的行，添加类样式tr_new
+           $(this).addClass("tr_new");
+       })
+   })
 </script>
 
-<!--3.对添加，保存，编辑，取消编辑，删除，全部删除进行对应的操作-->
+<!--3.对添加，保存，编辑，取消编辑，删除进行对应的操作-->
 <script>
-   
+   $(function(){
+       //1.删除
+       $("#del").on("click",function(){
+           var trFather = $(".tr_new");
+           if(trFather.length!=1){
+               alert("请选择一行要删除的数据！");
+           }else{
+               var isOK = confirm("您确定要删除吗？");
+               if(isOK){
+                   var resultNo = trFather.children()[0].innerText;
+                   $.ajax({
+                       url:"/res/deleteResult/"+resultNo,
+                       type:"DELETE",
+                       success:function(data){
+                           //将后台的json数据显示弹出，进行温馨提示
+                           alert(data.msg);
+                           //提示完，重新渲染一下页面
+                           window.location.reload();
+                       }
+
+                   })
+               }
+           }
+       })
+
+    //2.编辑
+    $("#edit").on("click",function(){
+        var trFather = $(".tr_new");
+        if(trFather.length!=1){
+            alert("请选择一行要编辑的数据！");
+        }else{
+            var child = trFather.children();
+            child[4].innerHTML = '<input type="text" size="3" maxlength="3" class="studentResult" value="'+child[4].innerText+'"/>';
+            $("#table_result tbody tr").unbind("click");
+        }
+        $(this).unbind("click");
+    })
+
+    //3.取消编辑
+    $("#cancel").on("click",function(){
+        window.location.reload();
+    })
+
+    //4.保存
+    $("#save").on("click",function () {
+        var trFather = $(".tr_new");
+        if(trFather.length!=1){
+            alert("请选择一行数据进行编辑！");
+        }else{
+            var resNo = trFather.children()[0].innerText;
+            var stuResult = $(".studentResult").val();
+            $.ajax({
+                url:"/res/updateResult",
+                type:"PUT",
+                data:{
+                    resultNo:resNo,
+                    studentResult:stuResult
+                },
+                success:function (data) {
+                    alert(data.msg);
+                    window.location.reload();
+                }
+            })
+        }
+    })
+
+    //5.添加
+    $("#addResult").on("click",function () {
+        var studentNo = $("#studentNo").val();
+        var subjectNo = $("#subjectNo").val();
+        var examDate = $("#examDate").val();
+        var studentResult = $("#studentResult").val();
+        $.ajax({
+            url:"/res/addResult",
+            type:"put",
+            data:{
+               studentNo:studentNo,
+               subjectNo:subjectNo,
+               examDate:examDate,
+               studentResult:studentResult
+            },
+            success:function (data) {
+                //1.将后台json数据显示弹出，进行温馨提示
+                alert(date.msg);
+                //2.提示完，重新渲染一下页面
+                window.location.reload();
+            }
+        })
+    })
+
+    //6.对学号进行异步查询
+    $("#studentNo").on("blur",function () {
+        var studentNo = $("#studentNo").val();
+        $("#stuNo").removeClass();
+        if(studentNo!=""){
+            $.ajax({
+                url:"/stu/getStuByNo/"+studentNo,
+                type:"GET",
+                success:function (data) {
+                    $("#stuNo").html("温馨提示:"+data.msg);
+                    $("#stuNo").addClass("blue")
+                }
+            })
+        }else{
+            $("#stuNo").html("温馨提示，学号不能为空！")
+            $("#stuNo").addClass("red")
+        }
+    })
+
+   })
 </script>
 <script>
 
 </script>
 <style type="text/css">
-   
+    .red {
+        color: #ff4c33;
+        font-size: 9px;
+        font-weight: bolder;
+        margin-left: 380px;
+    }
+    .blue {
+        color:blue;
+        font-size: 9px;
+        font-weight: bolder;
+        margin-left: 390px;
+    }
 </style>
 </html>

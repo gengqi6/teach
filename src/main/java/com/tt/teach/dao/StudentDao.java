@@ -1,5 +1,6 @@
 package com.tt.teach.dao;
 
+import com.tt.teach.pojo.Admins;
 import com.tt.teach.pojo.Student;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
@@ -23,4 +24,11 @@ public interface StudentDao {
 
     @Delete("delete from student where studentNo = #{stuNo}")
     int deleteStudent(Integer stuNo);
+
+    //admin登录
+    @Select("select * from admins where adminNo = #{adminNo} and loginPwd = #{loginPwd}")
+    Admins doLoginadmins(Admins admins);
+
+    @Select("select * from student where studentNo = #{studentNo}")
+    Student getStuByNo(Integer studentNo);
 }

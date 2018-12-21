@@ -1,5 +1,6 @@
 package com.tt.teach.controller;
 
+import com.tt.teach.pojo.Admins;
 import com.tt.teach.pojo.Student;
 import com.tt.teach.service.StudentService;
 import com.tt.teach.utils.BaseController;
@@ -30,8 +31,13 @@ public class StudentController extends BaseController{
     //请求：http://localhost:8080/stu/index
     @RequestMapping("/index")
     public String index(){
-        String studentName = (String) getSession().getAttribute(SESSION_KEY);
+        /*String studentName = (String) getSession().getAttribute(SESSION_KEY);
         if(studentName!=null){
+            return "/student/index";
+        }
+        return REDIRECT+"/stu/login";*/
+        String adminName = (String) getSession().getAttribute("adminName");
+        if(adminName!=null){
             return "/student/index";
         }
         return REDIRECT+"/stu/login";
@@ -46,7 +52,7 @@ public class StudentController extends BaseController{
     //请求：http://localhost:8080/stu/doLogin
     @RequestMapping(value = "/doLogin",method = RequestMethod.POST)
     public String doLogin(){
-        String xuehao = getRequest().getParameter("studentNo");
+        /*String xuehao = getRequest().getParameter("studentNo");
         Integer studentNo = Integer.parseInt(xuehao);
         String loginPwd = getRequest().getParameter("loginPwd");
         Student student = new Student();
@@ -57,12 +63,27 @@ public class StudentController extends BaseController{
             getSession().setAttribute(SESSION_KEY,student1.getStudentName());
             return FORWARD+"/stu/index";
         }
+        return REDIRECT+"/stu/login";*/
+        String bianhao = getRequest().getParameter("adminNo");
+        Integer adminNo = Integer.parseInt(bianhao);
+        String loginPwd = getRequest().getParameter("loginPwd");
+        Admins admins = new Admins();
+        admins.setAdminNo(adminNo);
+        admins.setLoginPwd(loginPwd);
+        Admins admins1 =  studentService.doLoginadmins(admins);
+
+        if(admins1!=null){
+            getSession().setAttribute("adminName",admins1.getAdminName());
+            return FORWARD+"/stu/index";
+        }
         return REDIRECT+"/stu/login";
     }
 
     @RequestMapping("/logout")
     public String logout(HttpSession session) {
-        session.removeAttribute(SESSION_KEY);
+        /*session.removeAttribute(SESSION_KEY);
+        return REDIRECT+"/stu/login";*/
+        session.removeAttribute("adminName");
         return REDIRECT+"/stu/login";
     }
 
@@ -100,6 +121,16 @@ public class StudentController extends BaseController{
             return FORWARD+"/stu/student";
         }
         return FORWARD+"stu/student";
+    }
+
+    @RequestMapping(value = "/getStuByNo/{studentNo}",method = RequestMethod.GET)
+    @ResponseBody
+    public Object getStuByNo(@PathVariable Integer studentNo){
+        Student student = studentService.getStuByNo(studentNo);
+        if(student!=null){
+            return JsonResult.ok("有该学生",student);
+        }
+        return JsonResult.no("没有该学生",student);
     }
 
 

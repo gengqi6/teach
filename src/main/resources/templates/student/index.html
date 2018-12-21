@@ -46,7 +46,8 @@
         <div class="col-sm-3 col-md-2 sidebar">
             <div class="left_header">
                 <p class="headImg"><img th:src="@{/static/images/tx.png}" alt=""></p>
-                <p class="userName" th:text="${session.studentName}">admin</p>
+                <!-- 下面一行替换为admin登录<p class="userName" th:text="${session.studentName}">admin</p>-->
+                <p class="userName" th:text="${session.adminName}">admin</p>
                 <p class="admin_class">(学生管理员)</p>
                 <p class="logout"><input type="button" value="注销" onclick="logout()"></p>
             </div>

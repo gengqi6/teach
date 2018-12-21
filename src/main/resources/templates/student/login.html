@@ -31,7 +31,8 @@
     <form class="form-signin" th:action="@{/stu/doLogin}"  th:method="post">
         <h2 class="form-signin-heading"><img th:src="@{/static/images/logo.png}" alt=""></h2>
         <label for="inputEmail" class="sr-only">账号 Username</label>
-        <input type="text" id="inputEmail" name="studentNo" class="form-control" placeholder="账号 Username" required autofocus>
+        <!-- 下面一行替换为admin登录<input type="text" id="inputEmail" name="studentNo" class="form-control" placeholder="账号 Username" required autofocus>-->
+        <input type="text" id="inputEmail" name="adminNo" class="form-control" placeholder="账号 Username" required autofocus>
         <label for="inputPassword" class="sr-only">密码 Password</label>
         <input type="password" id="inputPassword" name="loginPwd" class="form-control" placeholder="密码 Password" required>
         <div class="checkbox">
